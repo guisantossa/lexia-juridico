@@ -1,0 +1,38 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthContext'
+import PrivateRoute from './auth/PrivateRoute'
+
+import Analise from './pages/Analises'
+import NovaAnalise from './pages/NovaAnalise'
+import Login from './pages/Login'
+import LayoutPrivado from './auth/LayoutPrivado'
+import ResultadoAnalise from './pages/ResultadoAnalise'
+
+import Referencia from './pages/Referencias'
+import NovoLivro from './pages/LivroNovo'
+import LivroVisualizar from './pages/LivroVisualizar'
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+
+          <Route element={<PrivateRoute><LayoutPrivado /></PrivateRoute>}>
+            <Route path="/" element={<Analise />} />
+            <Route path="/analises" element={<Analise />} />
+            <Route path="/novaAnalise" element={<NovaAnalise />} />
+            <Route path="/analises/:id/resultados" element={<ResultadoAnalise />} />
+
+            <Route path="/referencias" element={<Referencia />} />
+            <Route path="/livros/novo" element={<NovoLivro />} />
+            <Route path="/livros/:id" element={<LivroVisualizar />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
+  )
+}
+
+export default App
