@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 # Garante que a pasta 'livros' exista
 os.makedirs("livros", exist_ok=True)
