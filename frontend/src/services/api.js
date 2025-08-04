@@ -1,7 +1,7 @@
 import axios from "axios";
-
+export const API_URL = import.meta.env.VITE_API_URL;
 const api = axios.create({
-  baseURL: "http://localhost:8000", // ajuste se for produção
+  baseURL: API_URL, // ajuste se for produção
 });
 
 // Adiciona o token automaticamente
