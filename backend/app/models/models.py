@@ -13,7 +13,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
 
@@ -149,3 +149,18 @@ class LivroChunk(Base):
     pagina_fim = Column(Integer)
     embedding = Column(Vector(1536), nullable=True)
     metadados = Column("metadata", JSONB)
+
+
+class ModelosMinuta(Base):
+    __tablename__ = "modelos_minuta"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
+    nome = Column(String, nullable=False)
+    descricao = Column(Text)
+    tags = Column(ARRAY(String))
+    conteudo_html = Column(Text, nullable=False)
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    atualizado_em = Column(
+        TIMESTAMP(timezone=True), onupdate=func.now(), server_default=func.now()
+    )

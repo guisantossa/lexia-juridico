@@ -5,15 +5,14 @@ pytesseract
 pdf2image
 PyMuPDF
 Pillow
-bcrypt
 pydantic
 sqlalchemy
 python-jose
 python-dotenv
 pydantic[email]
-passlib
 requests
 tiktoken
 google-cloud-vision
 tdqm
-pdf2image
+bcrypt==3.2.0
+passlib>=1.7.4

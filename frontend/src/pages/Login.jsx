@@ -1,15 +1,27 @@
-import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import {API_URL} from '../constants'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext'
+import { API_URL } from '../constants'
+
 export default function Login() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
 
+  const { isAuthenticated, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const origem = location.state?.from?.pathname || '/'
+  const [searchParams] = useSearchParams()
+
+  // 🚨 Se já está logado, redireciona automaticamente
+  useEffect(() => {
+    if (isAuthenticated) {
+      const next = searchParams.get('next') || '/'
+      navigate(next, { replace: true })
+    }
+  }, [isAuthenticated, navigate, searchParams])
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setErro('')
@@ -18,26 +30,28 @@ export default function Login() {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha }),
       })
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.detail || 'Erro ao fazer login.')
-      }
+      if (!response.ok) throw new Error(data.detail || 'Erro ao fazer login.')
 
       localStorage.setItem('lexia_token', data.access_token)
-      navigate(origem, { replace: true }) // Redireciona para a página inicial após login
+      login(data.access_token) // atualiza o AuthContext
+
+      const next = searchParams.get('next') || '/'
+      navigate(next, { replace: true })
     } catch (err) {
       setErro(err.message)
     } finally {
       setCarregando(false)
     }
   }
+
+  // Se já está logado, não renderiza o form (só pra garantir)
+  if (isAuthenticated) return null
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f] text-white">

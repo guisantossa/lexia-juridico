@@ -11,6 +11,8 @@ import ResultadoAnalise from './pages/ResultadoAnalise'
 import Referencia from './pages/Referencias'
 import NovoLivro from './pages/LivroNovo'
 import LivroVisualizar from './pages/LivroVisualizar'
+import Minutas from './pages/Minutas'
+import MinutaForm from './pages/MinutaForm'
 
 function App() {
   return (
@@ -28,6 +30,10 @@ function App() {
             <Route path="/referencias" element={<Referencia />} />
             <Route path="/livros/novo" element={<NovoLivro />} />
             <Route path="/livros/:id" element={<LivroVisualizar />} />
+
+            <Route path="/minutas" element={<Minutas />} />
+            <Route path="/minutas/nova" element={<MinutaForm />} />
+            <Route path="/minutas/:id" element={<MinutaForm />} />
           </Route>
         </Routes>
       </Router>

@@ -1,4 +1,4 @@
-import { FaFileAlt, FaChartBar, FaCog, FaBook , FaSignOutAlt  } from 'react-icons/fa';
+import { FaFileAlt, FaChartBar, FaCog, FaBook , FaSignOutAlt, FaFileSignature   } from 'react-icons/fa';
 import logo from '../assets/logo.png';
 import { useAuth } from '../auth/AuthContext'
 
@@ -34,6 +34,10 @@ export default function Sidebar() {
           <a href="/referencias" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
             <FaBook  className="text-lg" />
             Referencias
+          </a>
+          <a href="/minutas" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
+            <FaFileSignature   className="text-lg" />
+            Minutas
           </a>
         </nav>
       </div>

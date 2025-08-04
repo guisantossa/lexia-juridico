@@ -9,5 +9,5 @@ export default function PrivateRoute({ children }) {
 
   return isAuthenticated
     ? children
-    : <Navigate to="/login" state={{ from: location }} replace />
+    : <Navigate to={`/login?next=${location.pathname}`} replace />
 }
