@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { API_URL } from '../constants'
+import api from "../services/api";
 
 export default function ResultadoAnalise() {
   const { id } = useParams()

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { API_URL } from '../constants'
 import { useNavigate } from 'react-router-dom'
 import api from "../services/api";
 

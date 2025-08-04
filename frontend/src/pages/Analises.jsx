@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { API_URL } from '../constants'
 import api from "../services/api"; 
 
 export default function Analises() {
