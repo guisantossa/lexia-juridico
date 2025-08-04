@@ -7,7 +7,8 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-
+# Garante que a pasta 'livros' exista
+os.makedirs("livros", exist_ok=True)
 app.mount("/media", StaticFiles(directory="livros"), name="livros")
 GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 cors_origins = os.getenv("CORS_ORIGINS", "")
