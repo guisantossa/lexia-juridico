@@ -34,13 +34,16 @@ class Usuario(Base):
     estado = Column(CHAR(2))
     cep = Column(Text)
     oab = Column(Text, unique=True)
-    tipo = Column(Text, default="advogado")
+    perfil_usuario_id = Column(
+        ForeignKey("perfil_usuario.id"), nullable=False, default=2
+    )
     ativo = Column(Boolean, default=True)
     criado_em = Column(TIMESTAMP(timezone=True))
     atualizado_em = Column(TIMESTAMP(timezone=True))
 
     clientes = relationship("Cliente", back_populates="usuario")
     analises = relationship("Analise", back_populates="usuario")
+    perfil_usuario = relationship("PerfilUsuario", back_populates="usuarios")
 
 
 class Cliente(Base):
@@ -164,3 +167,37 @@ class ModelosMinuta(Base):
     atualizado_em = Column(
         TIMESTAMP(timezone=True), onupdate=func.now(), server_default=func.now()
     )
+
+
+class PerfilUsuario(Base):
+    __tablename__ = "perfil_usuario"
+
+    id = Column(Integer, primary_key=True, index=True)
+    perfil = Column(String, unique=True, nullable=False)
+
+    permissoes = relationship("PermissaoPerfil", back_populates="perfil")
+    usuarios = relationship("Usuario", back_populates="perfil_usuario")
+
+
+class Permissao(Base):
+    __tablename__ = "permissoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome_permissao = Column(String, unique=True, nullable=False)
+
+    perfis = relationship("PermissaoPerfil", back_populates="permissao")
+
+
+class PermissaoPerfil(Base):
+    __tablename__ = "permissoes_perfil"
+
+    perfil_usuario_id = Column(
+        Integer, ForeignKey("perfil_usuario.id", ondelete="CASCADE"), primary_key=True
+    )
+    permissao_id = Column(
+        Integer, ForeignKey("permissoes.id", ondelete="CASCADE"), primary_key=True
+    )
+    permitido = Column(Boolean, default=False)
+
+    perfil = relationship("PerfilUsuario", back_populates="permissoes")
+    permissao = relationship("Permissao", back_populates="perfis")

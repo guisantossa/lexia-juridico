@@ -1,6 +1,17 @@
 import os
 
-from app.routes import analise, livros, login, modelos, peticoes, tipos_analise
+from app.routes import (
+    analise,
+    livros,
+    login,
+    modelos,
+    perfil_usuario,
+    permissoes,
+    peticoes,
+    tipos_analise,
+    usuario_me,
+    usuarios,
+)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -28,6 +39,12 @@ app.include_router(tipos_analise.router, tags=["tipos_analise"])
 app.include_router(livros.router, tags=["referencias"])
 app.include_router(peticoes.router, tags=["peticoes"])
 app.include_router(modelos.router, tags=["modelos"])
+
+# NOVOS MÓDULOS
+app.include_router(usuarios.router, tags=["usuarios"])
+app.include_router(perfil_usuario.router, tags=["perfis"])
+app.include_router(permissoes.router, tags=["permissoes"])
+app.include_router(usuario_me.router, tags=["me"])
 
 
 @app.get("/")

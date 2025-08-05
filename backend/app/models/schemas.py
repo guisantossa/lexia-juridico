@@ -9,11 +9,20 @@ class UsuarioLogin(BaseModel):
     senha: str
 
 
+# --- PERFIL DE USUÁRIO ---
+class PerfilUsuarioOut(BaseModel):
+    id: int
+    perfil: str
+
+    class Config:
+        from_attributes = True
+
+
 class UsuarioOut(BaseModel):
     id: UUID
     nome_completo: str
     email: EmailStr
-    tipo: str
+    perfil_usuario: PerfilUsuarioOut
     ativo: bool
 
     class Config:
@@ -29,4 +38,41 @@ class UsuarioCreate(BaseModel):
     nome_completo: str
     email: EmailStr
     senha: str
-    telefone: Optional[str] = None
+    telefone: str
+    perfil_usuario_id: int
+    cep: Optional[str]
+    endereco: Optional[str]
+    bairro: Optional[str]
+    cidade: Optional[str]
+    estado: Optional[str]
+
+
+class UsuarioUpdate(BaseModel):
+    nome_completo: str
+    email: EmailStr
+    telefone: Optional[str]
+    perfil_usuario_id: int
+    cep: Optional[str]
+    endereco: Optional[str]
+    bairro: Optional[str]
+    cidade: Optional[str]
+    estado: Optional[str]
+
+
+# --- PERMISSÃO ---
+class PermissaoOut(BaseModel):
+    id: int
+    nome_permissao: str
+
+    class Config:
+        from_attributes = True
+
+
+class PermissaoPerfilUpdate(BaseModel):
+    permissao_id: int
+    permitido: bool
+
+
+class MinhasPermissoesOut(BaseModel):
+    perfil: str
+    permissoes: list[PermissaoOut]

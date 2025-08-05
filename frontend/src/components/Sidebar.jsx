@@ -27,7 +27,7 @@ export default function Sidebar() {
             <FaChartBar className="text-lg" />
             Relatórios
           </a>
-          <a href="#" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
+          <a href="/configuracoes" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
             <FaCog className="text-lg" />
             Configurações
           </a>

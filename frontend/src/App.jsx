@@ -9,10 +9,17 @@ import LayoutPrivado from './auth/LayoutPrivado'
 import ResultadoAnalise from './pages/ResultadoAnalise'
 
 import Referencia from './pages/Referencias'
+
 import NovoLivro from './pages/LivroNovo'
 import LivroVisualizar from './pages/LivroVisualizar'
+
 import Minutas from './pages/Minutas'
 import MinutaForm from './pages/MinutaForm'
+
+import Configuracoes from './pages/Configuracoes'
+import UsuarioForm from './pages/UsuarioForm'
+import PerfilForm from './pages/PerfilForm'
+import PermissaoForm from './pages/PermissaoForm'
 
 function App() {
   return (
@@ -34,6 +41,14 @@ function App() {
             <Route path="/minutas" element={<Minutas />} />
             <Route path="/minutas/nova" element={<MinutaForm />} />
             <Route path="/minutas/:id" element={<MinutaForm />} />
+
+            <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route path="/usuarios/novo" element={<UsuarioForm />} />
+            <Route path="/usuarios/:id" element={<UsuarioForm />} />
+            <Route path="/perfis/novo" element={<PerfilForm />} />
+            <Route path="/perfis/:id" element={<PerfilForm />} />
+            <Route path="/permissoes/novo" element={<PermissaoForm />} />
+            <Route path="/permissoes/:id" element={<PermissaoForm />} />
           </Route>
         </Routes>
       </Router>
