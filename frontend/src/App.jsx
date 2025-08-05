@@ -21,6 +21,9 @@ import UsuarioForm from './pages/UsuarioForm'
 import PerfilForm from './pages/PerfilForm'
 import PermissaoForm from './pages/PermissaoForm'
 
+import Clientes from './pages/Cliente'
+import ClientesForm from './pages/ClienteForm'
+
 function App() {
   return (
     <AuthProvider>
@@ -49,6 +52,9 @@ function App() {
             <Route path="/perfis/:id" element={<PerfilForm />} />
             <Route path="/permissoes/novo" element={<PermissaoForm />} />
             <Route path="/permissoes/:id" element={<PermissaoForm />} />
+
+            <Route path="/clientes/" element={<Clientes />} />
+            <Route path="/clientes/:id" element={<ClientesForm />} />
           </Route>
         </Routes>
       </Router>

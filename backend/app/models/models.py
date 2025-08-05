@@ -201,3 +201,66 @@ class PermissaoPerfil(Base):
 
     perfil = relationship("PerfilUsuario", back_populates="permissoes")
     permissao = relationship("Permissao", back_populates="perfis")
+
+
+class Tribunal(Base):
+    __tablename__ = "tribunais"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    sigla = Column(String, nullable=False, unique=True)
+    nome_completo = Column(String, nullable=False)
+
+    comarcas = relationship("Comarca", back_populates="tribunal")
+
+
+class Comarca(Base):
+    __tablename__ = "comarcas"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tribunal_id = Column(UUID(as_uuid=True), ForeignKey("tribunais.id"), nullable=False)
+    nome = Column(String, nullable=False)
+    codigo = Column(String)
+
+    tribunal = relationship("Tribunal", back_populates="comarcas")
+    varas = relationship("Vara", back_populates="comarca")
+
+
+class Vara(Base):
+    __tablename__ = "varas"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    comarca_id = Column(UUID(as_uuid=True), ForeignKey("comarcas.id"), nullable=False)
+    tipo_vara = Column(String)
+    nome = Column(String, nullable=False)
+    competencia = Column(String)
+
+    comarca = relationship("Comarca", back_populates="varas")
+
+
+class Processo(Base):
+    __tablename__ = "processos"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
+    cliente_id = Column(UUID(as_uuid=True), ForeignKey("clientes.id"), nullable=False)
+    numero_processo = Column(String, nullable=False, unique=True)
+
+    tribunal_id = Column(UUID(as_uuid=True), ForeignKey("tribunais.id"), nullable=False)
+    comarca_id = Column(UUID(as_uuid=True), ForeignKey("comarcas.id"))
+    vara_id = Column(UUID(as_uuid=True), ForeignKey("varas.id"))
+
+    classe_processo = Column(String)
+    assunto = Column(String)
+    fase_atual = Column(String)
+
+    data_distribuicao = Column(TIMESTAMP)
+    ultimo_andamento = Column(Text)
+    data_ultimo_andamento = Column(TIMESTAMP)
+
+    pasta_url = Column(Text)
+    arquivo_peticao_inicial = Column(Text)
+    observacoes = Column(Text)
+
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())

@@ -2,6 +2,7 @@ import os
 
 from app.routes import (
     analise,
+    clientes,
     livros,
     login,
     modelos,
@@ -45,6 +46,8 @@ app.include_router(usuarios.router, tags=["usuarios"])
 app.include_router(perfil_usuario.router, tags=["perfis"])
 app.include_router(permissoes.router, tags=["permissoes"])
 app.include_router(usuario_me.router, tags=["me"])
+
+app.include_router(clientes.router)
 
 
 @app.get("/")

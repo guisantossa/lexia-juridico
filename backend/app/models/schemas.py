@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
 
 
 class UsuarioLogin(BaseModel):
@@ -76,3 +76,28 @@ class PermissaoPerfilUpdate(BaseModel):
 class MinhasPermissoesOut(BaseModel):
     perfil: str
     permissoes: list[PermissaoOut]
+
+
+# schema.py
+
+
+class ClienteBase(BaseModel):
+    nome: str
+    cpf: str  # Sem restrição aqui
+    endereco: Optional[str]
+    bairro: Optional[str]
+    cidade: Optional[str]
+    estado: Optional[str]
+    cep: Optional[str]
+
+
+class ClienteCreate(ClienteBase):
+    cpf: constr(min_length=11, max_length=14)  # Valida só na criação
+
+
+class ClienteOut(ClienteBase):
+    id: UUID
+    usuario_id: UUID
+
+    class Config:
+        from_attributes = True
