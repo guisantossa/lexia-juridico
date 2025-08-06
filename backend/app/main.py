@@ -3,15 +3,19 @@ import os
 from app.routes import (
     analise,
     clientes,
+    comarcas,
     livros,
     login,
     modelos,
     perfil_usuario,
     permissoes,
     peticoes,
+    processos,
     tipos_analise,
+    tribunais,
     usuario_me,
     usuarios,
+    varas,
 )
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,12 +46,17 @@ app.include_router(peticoes.router, tags=["peticoes"])
 app.include_router(modelos.router, tags=["modelos"])
 
 # NOVOS MÓDULOS
-app.include_router(usuarios.router, tags=["usuarios"])
-app.include_router(perfil_usuario.router, tags=["perfis"])
-app.include_router(permissoes.router, tags=["permissoes"])
-app.include_router(usuario_me.router, tags=["me"])
+app.include_router(usuarios.router)
+app.include_router(perfil_usuario.router)
+app.include_router(permissoes.router)
+app.include_router(usuario_me.router)
 
 app.include_router(clientes.router)
+
+app.include_router(tribunais.router, tags=["Tribunais"])
+app.include_router(comarcas.router, tags=["Comarcas"])
+app.include_router(varas.router, tags=["Varas"])
+app.include_router(processos.router, tags=["Processos Judiciais"])
 
 
 @app.get("/")

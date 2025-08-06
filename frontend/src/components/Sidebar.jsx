@@ -19,6 +19,10 @@ export default function Sidebar() {
 
         {/* Menu */}
         <nav className="flex flex-col gap-4">
+          <a href="/processos" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
+            <FaFileAlt className="text-lg" />
+            Processos
+          </a>
           <a href="/analises" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
             <FaFileAlt className="text-lg" />
             Análises

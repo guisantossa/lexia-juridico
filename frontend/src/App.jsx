@@ -24,6 +24,9 @@ import PermissaoForm from './pages/PermissaoForm'
 import Clientes from './pages/Cliente'
 import ClientesForm from './pages/ClienteForm'
 
+import Processos from './pages/Processos'
+import ProcessosForm from './pages/ProcessosForm'
+
 function App() {
   return (
     <AuthProvider>
@@ -55,6 +58,11 @@ function App() {
 
             <Route path="/clientes/" element={<Clientes />} />
             <Route path="/clientes/:id" element={<ClientesForm />} />
+            <Route path="/clientes/novo" element={<ClientesForm />} />
+
+            <Route path="/processos/" element={<Processos />} />
+            <Route path="/processos/:id" element={<ProcessosForm />} />
+            <Route path="/processos/novo" element={<ProcessosForm />} />
           </Route>
         </Routes>
       </Router>

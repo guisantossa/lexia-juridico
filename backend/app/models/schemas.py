@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -98,6 +99,94 @@ class ClienteCreate(ClienteBase):
 class ClienteOut(ClienteBase):
     id: UUID
     usuario_id: UUID
+    nome: str
+    cpf: constr(min_length=11, max_length=14)  # Valida só na criação
+
+    class Config:
+        from_attributes = True
+
+
+class TribunalBase(BaseModel):
+    sigla: str
+    nome_completo: str
+
+
+class TribunalCreate(TribunalBase):
+    pass
+
+
+class Tribunal(TribunalBase):
+    id: UUID
+
+    class Config:
+        from_attributes = True
+
+
+class ComarcaBase(BaseModel):
+    nome: str
+    codigo: str | None = None
+
+
+class ComarcaCreate(ComarcaBase):
+    tribunal_id: UUID
+
+
+class Comarca(ComarcaBase):
+    id: UUID
+    tribunal_id: UUID
+
+    class Config:
+        from_attributes = True
+
+
+class VaraBase(BaseModel):
+    nome: str
+    tipo_vara: str | None = None
+    competencia: str | None = None
+
+
+class VaraCreate(VaraBase):
+    comarca_id: UUID
+
+
+class Vara(VaraBase):
+    id: UUID
+    comarca_id: UUID
+
+    class Config:
+        from_attributes = True
+
+
+class ProcessoBase(BaseModel):
+    numero_processo: str
+    classe_processo: str | None = None
+    assunto: str | None = None
+    fase_atual: str | None = None
+    data_distribuicao: datetime | None = None
+    ultimo_andamento: str | None = None
+    data_ultimo_andamento: datetime | None = None
+    pasta_url: str | None = None
+    arquivo_peticao_inicial: str | None = None
+    observacoes: str | None = None
+
+
+class ProcessoCreate(ProcessoBase):
+    usuario_id: UUID
+    cliente_id: UUID
+    tribunal_id: UUID
+    comarca_id: UUID | None = None
+    vara_id: UUID | None = None
+
+
+class Processo(ProcessoBase):
+    id: UUID
+    usuario_id: UUID
+    cliente_id: UUID
+    tribunal_id: UUID
+    comarca_id: UUID | None = None
+    vara_id: UUID | None = None
+    criado_em: datetime
+    atualizado_em: datetime
 
     class Config:
         from_attributes = True

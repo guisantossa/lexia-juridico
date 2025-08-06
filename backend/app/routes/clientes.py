@@ -1,19 +1,17 @@
-# routers/clientes.py
-
 from uuid import UUID
 
 from app.db.session import get_db
 from app.models.models import Cliente, Usuario
 from app.models.schemas import ClienteCreate, ClienteOut
 from app.services.auth_dependencies import get_current_user
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/clientes", tags=["Clientes"])
 
 
 # Criar cliente
-@router.post("/", response_model=ClienteOut)
+@router.post("", response_model=ClienteOut, include_in_schema=False)
 def criar_cliente(
     cliente: ClienteCreate,
     db: Session = Depends(get_db),
@@ -37,16 +35,21 @@ def criar_cliente(
     return novo_cliente
 
 
-# Listar todos os clientes do usuário
-@router.get("/", response_model=list[ClienteOut])
-def listar_clientes(
-    db: Session = Depends(get_db), usuario: Usuario = Depends(get_current_user)
+# Listar todos os clientes do usuário ou buscar por nome
+@router.get("", response_model=list[ClienteOut], include_in_schema=False)
+def listar_ou_filtrar_clientes(
+    nome: str = Query(None),
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(get_current_user),
 ):
-    return db.query(Cliente).filter(Cliente.usuario_id == usuario.id).all()
+    query = db.query(Cliente).filter(Cliente.usuario_id == usuario.id)
+    if nome:
+        query = query.filter(Cliente.nome.ilike(f"%{nome}%"))
+    return query.limit(10).all()
 
 
 # Obter cliente por ID
-@router.get("/{cliente_id}", response_model=ClienteOut)
+@router.get("/{cliente_id}/", response_model=ClienteOut)
 def obter_cliente(
     cliente_id: UUID,
     db: Session = Depends(get_db),
@@ -63,7 +66,7 @@ def obter_cliente(
 
 
 # Atualizar cliente
-@router.put("/{cliente_id}", response_model=ClienteOut)
+@router.put("/{cliente_id}/", response_model=ClienteOut)
 def atualizar_cliente(
     cliente_id: UUID,
     dados: ClienteCreate,
