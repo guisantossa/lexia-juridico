@@ -133,3 +133,15 @@ def dividir_texto_em_chunks(livro_id: str, db: Session, tamanho_max=2000):
     db.commit()
 
     return {"chunks_gerados": len(chunks)}
+
+
+def status_str(codigo: int) -> str:
+    return {
+        1: "aguardando",
+        2: "finalizado",
+        3: "excluido",
+        4: "processando",
+        5: "erro",
+        6: "estruturado",
+        7: "laudo_disponivel",
+    }.get(codigo, "desconhecido")

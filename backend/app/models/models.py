@@ -82,30 +82,47 @@ class Analise(Base):
     usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
     cliente_id = Column(UUID(as_uuid=True), ForeignKey("clientes.id"), nullable=False)
     tipo_id = Column(Integer, ForeignKey("tipos_analise.id"), nullable=False)
+    processo_id = Column(UUID(as_uuid=True), ForeignKey("processos.id"), nullable=True)
+
     arquivo_original_url = Column(Text, nullable=False)
     arquivo_nome = Column(Text, nullable=False)
+
+    status = Column(Integer, default=1)
     data_envio = Column(TIMESTAMP(timezone=True))
-    status = Column(Integer, default=1)  # 1: ativo, 2: finalizado, 3: excluido
-    usuario = relationship("Usuario", back_populates="analises")
-    cliente = relationship("Cliente", back_populates="analises")
-    tipo = relationship("TipoAnalise", back_populates="analises")
-    resultado = relationship("ResultadoAnalise", back_populates="analise")
-
-
-class ResultadoAnalise(Base):
-    __tablename__ = "resultados_analise"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    analise_id = Column(UUID(as_uuid=True), ForeignKey("analises.id"), nullable=False)
-    status = Column(Text, default="aguardando")
-    json_extraido = Column(JSONB)
-    texto_extraido = Column(Text)
-    resultado_pdf_url = Column(Text)
     data_conclusao = Column(TIMESTAMP(timezone=True))
+
+    texto_extraido = Column(Text)
+    texto_limpo = Column(Text)
+    json_extraido = Column(JSONB)
+
+    tokens = Column(Integer)
+    caracteres = Column(Integer)
+
+    resultado_pdf_url = Column(Text)
     revisao_humana = Column(Boolean, default=False)
     observacoes = Column(Text)
 
-    analise = relationship("Analise", back_populates="resultado")
+    usuario = relationship("Usuario", back_populates="analises")
+    cliente = relationship("Cliente", back_populates="analises")
+    tipo = relationship("TipoAnalise", back_populates="analises")
+    processo = relationship("Processo", back_populates="analises")
+    livros = relationship(
+        "AnaliseLivro", back_populates="analise", cascade="all, delete-orphan"
+    )
+
+
+class AnaliseLivro(Base):
+    __tablename__ = "analise_livros"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    analise_id = Column(UUID(as_uuid=True), ForeignKey("analises.id"), nullable=False)
+    livro_id = Column(UUID(as_uuid=True), ForeignKey("livros.id"), nullable=False)
+    chunk_tag = Column(Text)
+
+    analise = relationship("Analise", back_populates="livros")
+    livro = relationship(
+        "LivroPDF", back_populates="analises"
+    )  # precisa existir o back_populates no model Livro
 
 
 class HistoricoToken(Base):
@@ -119,8 +136,6 @@ class HistoricoToken(Base):
     tokens = Column(Integer, nullable=False)
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
-    resultado = relationship("ResultadoAnalise", backref="historicos_tokens")
-
 
 class LivroPDF(Base):
     __tablename__ = "livros"
@@ -129,6 +144,7 @@ class LivroPDF(Base):
     nome = Column(String, nullable=False)
     caminho = Column(String, nullable=False)
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
+    analises = relationship("AnaliseLivro", back_populates="livro")
 
 
 class LivroPagina(Base):
@@ -264,3 +280,5 @@ class Processo(Base):
 
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
     atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    analises = relationship("Analise", back_populates="processo")
