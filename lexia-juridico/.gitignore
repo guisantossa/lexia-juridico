@@ -1,0 +1,7 @@
+.env
+.venv/
+docs/
+files/
+credencials/
+
+uploads/

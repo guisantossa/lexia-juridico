@@ -1,0 +1,114 @@
+{
+  "name": "gerar_peticao",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gerar-peticao",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook - Entrada",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "\nconst dados = $json[\"body\"][\"dados_ppp\"];\nconst trabalhador = dados.trabalhador.nome;\nconst cargo = dados.vinculos[0].cargo;\nconst empresa = dados.empresa.nome;\nconst riscos = dados.vinculos[0].fatores_risco.map(r => r.tipo).join(\", \");\nconst descricao = dados.vinculos[0].descricao_atividades;\n\nlet contexto = $json[\"vector\"][\"matches\"]\n    .map((match, i) => `Trecho ${i+1}:\n${match.metadata.texto}`)\n    .join(\"\\n\\n\");\n\nconst prompt = `Você é um assistente jurídico. Gere uma petição trabalhista ou laudo técnico com base nas informações abaixo. Seja formal, técnico e direto.\\n\nTrabalhador: ${trabalhador}\nCargo: ${cargo}\nEmpresa: ${empresa}\nRiscos Identificados: ${riscos}\nDescrição das Atividades: ${descricao}\n\nContexto adicional extraído do PPP:\n${contexto}`;\n\nreturn [{ json: { prompt, livro_id: $json[\"body\"][\"livro_id\"] } }];\n"
+      },
+      "name": "Montar Prompt",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Você é um assistente jurídico especializado em petições técnicas baseadas em PPP. Use o contexto e os dados fornecidos para gerar um texto formal e claro."
+          },
+          {
+            "role": "user",
+            "content": "={{$json[\"prompt\"]}}"
+          }
+        ]
+      },
+      "name": "OpenAI - Chat",
+      "type": "n8n-nodes-base.openai.chat",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://seuservidor.com/api/peticoes/salvar",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "\n{\n  \"livro_id\": \"={{$json[\"livro_id\"]}}\",\n  \"peticao\": \"={{$json[\"message\"]}}\"\n}\n"
+      },
+      "name": "Salvar Petição",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "\nreturn [{\n  json: {\n    body: $json,\n    vector: $json\n  }\n}];\n"
+      },
+      "name": "Juntar Resultados",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Entrada": {
+      "main": [
+        [
+          "Juntar Resultados"
+        ]
+      ]
+    },
+    "Juntar Resultados": {
+      "main": [
+        [
+          "Montar Prompt"
+        ]
+      ]
+    },
+    "Montar Prompt": {
+      "main": [
+        [
+          "OpenAI - Chat"
+        ]
+      ]
+    },
+    "OpenAI - Chat": {
+      "main": [
+        [
+          "Salvar Petição"
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "1754165515.77002"
+}

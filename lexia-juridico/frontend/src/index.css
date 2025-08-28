@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --lexia-primary: #0094FF;
+  --lexia-bg: #0f0f0f;
+  --lexia-panel: #1a1a1a;
+  --lexia-text: #f4f4f5;
+  --lexia-muted: #9ca3af;
+  --lexia-success: #10b981;
+  --lexia-warning: #f59e0b;
+  --lexia-error: #ef4444;
+}
+
+@layer base {
+  body {
+    background-color: var(--lexia-bg);
+    color: var(--lexia-text);
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .lexia-button {
+    @apply bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1 rounded-md text-sm transition-colors;
+  }
+
+  .lexia-card {
+    @apply bg-[#1a1a1a] p-4 rounded-xl shadow;
+  }
+
+  .lexia-sidebar {
+    @apply bg-[#1a1a1a] w-64 h-screen p-6 text-[#f4f4f5];
+  }
+
+  .lexia-table {
+    @apply w-full text-sm text-left;
+  }
+
+  .lexia-badge-warning {
+    @apply bg-yellow-500 text-black px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .lexia-badge-success {
+    @apply bg-emerald-500 text-black px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .lexia-badge-error {
+    @apply bg-red-500 text-white px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .lexia-badge-processing {
+    @apply bg-blue-500 text-white px-2 py-0.5 rounded text-xs font-medium;
+  }
+}
+@layer utilities {
+  .lexia-text-muted {
+    color: var(--lexia-muted);
+  }
+
+  .lexia-text-primary {
+    color: var(--lexia-primary);
+  }
+
+  .lexia-bg-panel {
+    background-color: var(--lexia-panel);
+  }
+
+  .lexia-bg-success {
+    background-color: var(--lexia-success);
+  }
+
+  .lexia-bg-warning {
+    background-color: var(--lexia-warning);
+  }
+
+  .lexia-bg-error {
+    background-color: var(--lexia-error);
+  }
+}
