@@ -1,4 +1,5 @@
 import uuid
+
 from app.db.base import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
@@ -12,11 +13,9 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
-
 
 
 class Usuario(Base):
@@ -76,7 +75,6 @@ class LivroPDF(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
 
 
-
 class LivroPagina(Base):
     __tablename__ = "livros_pagina"
 
@@ -98,5 +96,3 @@ class LivroChunk(Base):
     pagina_fim = Column(Integer)
     embedding = Column(Vector(1536), nullable=True)
     metadados = Column("metadata", JSONB)
-
-

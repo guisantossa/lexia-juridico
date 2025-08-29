@@ -15,7 +15,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 # IMPORTANTE: importe TODOS os models aqui para o autogenerate enxergar
-from app.models.models import Usuario, Analise, LivroPDF, LivroPagina, LivroChunk  # garante criação das tabelas
+from app.models.models import (  # garante criação das tabelas
+    Analise,
+    LivroChunk,
+    LivroPagina,
+    LivroPDF,
+    Usuario,
+)
 
 # --- Imports do seu projeto ---
 from dotenv import load_dotenv

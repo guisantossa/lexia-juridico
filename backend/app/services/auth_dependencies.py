@@ -1,3 +1,5 @@
+import os
+
 from app.db.session import get_db
 from app.models.models import Usuario
 from app.services.auth_utils import ALGORITHM, SECRET_KEY
@@ -5,12 +7,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt
 from sqlalchemy.orm import Session
-import os
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 BYPASS_TOKEN = "dev-bypass-token"
+
 
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
@@ -26,7 +27,7 @@ def get_current_user(
             id="dev-user",
             nome_completo="Usuário Dev",
             email="dev@lexia.local",
-            ativo=True
+            ativo=True,
         )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

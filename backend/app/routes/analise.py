@@ -1,14 +1,12 @@
 import os
-from datetime import datetime
 import uuid
+from datetime import datetime
+
 import requests
 from app.db.session import get_db
 from app.models.models import Analise
 from app.services.auth_dependencies import get_current_user
-from app.services.pdf_processor import (
-    extract_text_from_pdf,
-    extract_text_google_ocr,
-)
+from app.services.pdf_processor import extract_text_from_pdf, extract_text_google_ocr
 from app.services.tokenizer import contar_tokens
 from app.services.utils import limpar_texto_ppp, limpar_texto_ppp_ocr, status_str
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
@@ -119,14 +117,14 @@ def nova_analise(
         # persiste analise
         analise = Analise(
             usuario_id=usuario.id,
-            titulo=titulo,                        # <- requer coluna 'titulo' em Analise
+            titulo=titulo,  # <- requer coluna 'titulo' em Analise
             arquivo_nome=filename,
             arquivo_original_url=file_location,
             texto_extraido=texto_extraido,
             texto_limpo=texto_limpo,
             tokens=tokens,
             caracteres=caracteres,
-            status=1,                             # aguardando
+            status=1,  # aguardando
             data_envio=datetime.now(),
         )
         db.add(analise)
@@ -144,14 +142,18 @@ def nova_analise(
             r = requests.post(
                 N8N_WEBHOOK_URL_ANALISE,
                 json=payload,
-                auth=HTTPBasicAuth(N8N_USER, N8N_PASS) if N8N_USER and N8N_PASS else None,
+                auth=(
+                    HTTPBasicAuth(N8N_USER, N8N_PASS) if N8N_USER and N8N_PASS else None
+                ),
                 timeout=20,
             )
             r.raise_for_status()
         except Exception as e:
             analise.status = 5  # erro ao enviar
             db.commit()
-            raise HTTPException(status_code=500, detail=f"Erro ao enviar ao n8n: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Erro ao enviar ao n8n: {str(e)}"
+            )
 
         return {
             "id": str(analise.id),

@@ -1,11 +1,6 @@
 import os
 
-from app.routes import (
-    analise,
-    livros,
-    login,
-    usuarios,
-)
+from app.routes import analise, livros, login, usuarios
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -33,9 +28,6 @@ app.include_router(livros.router, tags=["referencias"])
 
 # NOVOS MÓDULOS
 app.include_router(usuarios.router)
-
-
-
 
 
 @app.get("/")

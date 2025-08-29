@@ -1,13 +1,13 @@
 """initial
-
 Revision ID: 0001_initial
-Revises: 
+Revises: 1
 Create Date: 2025-08-28
-
 """
-from alembic import op
-import sqlalchemy as sa
+
 import uuid
+
+import sqlalchemy as sa
+from alembic import op
 from pgvector.sqlalchemy import Vector
 
 # revision identifiers, used by Alembic.
@@ -18,10 +18,15 @@ depends_on = None
 
 
 def upgrade():
-    
+
     op.create_table(
         "usuarios",
-        sa.Column("id", sa.dialects.postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+        sa.Column(
+            "id",
+            sa.dialects.postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            default=uuid.uuid4,
+        ),
         sa.Column("nome_completo", sa.Text(), nullable=False),
         sa.Column("email", sa.Text(), unique=True, nullable=False),
         sa.Column("telefone", sa.Text(), unique=True),
@@ -39,8 +44,18 @@ def upgrade():
 
     op.create_table(
         "analises",
-        sa.Column("id", sa.dialects.postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-        sa.Column("usuario_id", sa.dialects.postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "id",
+            sa.dialects.postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            default=uuid.uuid4,
+        ),
+        sa.Column(
+            "usuario_id",
+            sa.dialects.postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("arquivo_original_url", sa.Text(), nullable=False),
         sa.Column("arquivo_nome", sa.Text(), nullable=False),
         sa.Column("titulo", sa.Text(), nullable=False),
@@ -59,16 +74,28 @@ def upgrade():
 
     op.create_table(
         "livros",
-        sa.Column("id", sa.dialects.postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+        sa.Column(
+            "id",
+            sa.dialects.postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            default=uuid.uuid4,
+        ),
         sa.Column("nome", sa.String(), nullable=False),
         sa.Column("caminho", sa.String(), nullable=False),
-        sa.Column("criado_em", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "criado_em", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
     )
 
     op.create_table(
         "livros_pagina",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("livro_id", sa.dialects.postgresql.UUID(as_uuid=True), sa.ForeignKey("livros.id"), nullable=False),
+        sa.Column(
+            "livro_id",
+            sa.dialects.postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("livros.id"),
+            nullable=False,
+        ),
         sa.Column("numero_pagina", sa.Integer, nullable=False),
         sa.Column("texto", sa.Text, nullable=False),
         sa.Column("texto_limpo", sa.Text),
@@ -77,7 +104,12 @@ def upgrade():
     op.create_table(
         "livros_chunks",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("livro_id", sa.dialects.postgresql.UUID(as_uuid=True), sa.ForeignKey("livros.id"), nullable=False),
+        sa.Column(
+            "livro_id",
+            sa.dialects.postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("livros.id"),
+            nullable=False,
+        ),
         sa.Column("chunk_index", sa.Integer, nullable=False),
         sa.Column("texto", sa.Text, nullable=False),
         sa.Column("pagina_inicio", sa.Integer),
