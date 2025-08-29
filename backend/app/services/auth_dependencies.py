@@ -5,9 +5,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt
 from sqlalchemy.orm import Session
+import os
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+BYPASS_TOKEN = "dev-bypass-token"
 
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
@@ -17,6 +20,14 @@ def get_current_user(
         detail="Não autorizado",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    # 🔹 bypass em DEV
+    if os.getenv("BYPASS_AUTH") == "1" and token == BYPASS_TOKEN:
+        return Usuario(
+            id="dev-user",
+            nome_completo="Usuário Dev",
+            email="dev@lexia.local",
+            ativo=True
+        )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")

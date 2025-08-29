@@ -82,17 +82,6 @@ def dividir_texto_em_ppps(texto: str) -> List[str]:
     ]
 
 
-def executar_divisao_por_tipo(tipo_id: int, texto: str):
-    if tipo_id == 1:  # Análise de PPP
-        return dividir_texto_em_ppps(texto)
-    elif tipo_id == 2:  # Contestação IR (futuro)
-        raise NotImplementedError("Divisão de IR ainda não implementada.")
-    elif tipo_id == 3:  # Contestação de Laudo Médico (futuro)
-        raise NotImplementedError("Divisão de Laudo Médico ainda não implementada.")
-    else:
-        raise ValueError("Tipo de análise inválido.")
-
-
 def extract_text_google_ocr(pdf_path: str) -> str:
     client = vision_v1.ImageAnnotatorClient()
 

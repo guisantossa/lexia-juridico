@@ -1,13 +1,11 @@
 import os
 from datetime import datetime
-
+import uuid
 import requests
 from app.db.session import get_db
-from app.models.models import Analise, Cliente, Processo
+from app.models.models import Analise
 from app.services.auth_dependencies import get_current_user
-from app.services.historico import registrar_historico_token
 from app.services.pdf_processor import (
-    executar_divisao_por_tipo,
     extract_text_from_pdf,
     extract_text_google_ocr,
 )
@@ -43,9 +41,6 @@ def listar_analises(db: Session = Depends(get_db), usuario=Depends(get_current_u
             "id": str(a.id),
             "arquivo_nome": a.arquivo_nome,
             "data_envio": a.data_envio,
-            "tipo": a.tipo.nome,
-            "cliente": {"nome": a.cliente.nome, "cpf": a.cliente.cpf},
-            "processo": a.processo,
             "status": a.status,
         }
         for a in analises
@@ -66,14 +61,6 @@ def vizualizar_analise(
             "id": str(analise.id),
             "arquivo_nome": analise.arquivo_nome,
             "data_envio": analise.data_envio.strftime("%Y-%m-%d %H:%M:%S"),
-            "tipo": analise.tipo.nome,
-            "cliente": {
-                "nome": analise.cliente.nome,
-                "cpf": analise.cliente.cpf,
-            },
-            "processo": {
-                "numero": analise.processo.numero if analise.processo else None,
-            },
             "status": status_str(analise.status),
             "texto_extraido": analise.texto_extraido,
             "texto_limpo": analise.texto_limpo,
@@ -85,41 +72,34 @@ def vizualizar_analise(
 
 @router.post("/analises/nova", summary="Fazer upload de um PDF para análise")
 def nova_analise(
-    tipo_id: int = Form(...),
-    cliente_id: str = Form(...),
-    processo_id: str = Form(None),
+    titulo: str = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     usuario=Depends(get_current_user),
 ):
-    print("tipo_id:", tipo_id)
-    print("cliente_id:", cliente_id)
-    print("processo_id:", processo_id)
-    print("file:", file.filename if file else None)
     try:
-        if not file.filename.lower().endswith(".pdf"):
+        # valida extensão e content-type
+        filename = file.filename or ""
+        if not filename.lower().endswith(".pdf"):
             raise HTTPException(status_code=400, detail="O arquivo precisa ser um PDF.")
+        if file.content_type not in ("application/pdf", "application/octet-stream"):
+            # alguns navegadores mandam octet-stream; aceitaremos
+            pass
 
-        cliente = (
-            db.query(Cliente).filter_by(id=cliente_id, usuario_id=usuario.id).first()
-        )
-        if not cliente:
-            raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+        # garante diretório
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-        processo = None
-        if processo_id:
-            processo = (
-                db.query(Processo)
-                .filter_by(id=processo_id, usuario_id=usuario.id)
-                .first()
-            )
-            if not processo:
-                raise HTTPException(status_code=404, detail="Processo não encontrado.")
+        # nomeia arquivo para evitar colisão
+        safe_name = filename.replace("/", "_").replace("\\", "_")
+        unique_prefix = uuid.uuid4().hex[:8]
+        stored_name = f"{unique_prefix}_{safe_name}"
+        file_location = os.path.join(UPLOAD_DIR, stored_name)
 
-        file_location = os.path.join(UPLOAD_DIR, file.filename)
+        # grava arquivo
         with open(file_location, "wb") as f:
             f.write(file.file.read())
 
+        # extrai texto (OCR fallback)
         texto = extract_text_from_pdf(file_location)
         if not texto or len(texto) < 200:
             texto = extract_text_google_ocr(file_location)
@@ -129,65 +109,58 @@ def nova_analise(
                 status_code=400, detail="Não foi possível extrair conteúdo do PDF."
             )
 
-        resultados = executar_divisao_por_tipo(tipo_id, texto)
-
-        if len(resultados) > 1:
-            raise HTTPException(
-                status_code=400, detail="Mais de um documento no Anexo."
-            )
-
-        if not resultados:
-            raise HTTPException(
-                status_code=400, detail="Nenhum PPP reconhecido no documento enviado."
-            )
-
-        texto_extraido = resultados[0]
+        # limpeza e contagem de tokens
+        texto_extraido = texto
         texto_limpo = limpar_texto_ppp_ocr(texto_extraido)
-        contagem = contar_tokens(texto_limpo)
+        contagem = contar_tokens(texto_limpo) or {}
+        tokens = contagem.get("tokens")
+        caracteres = contagem.get("caracteres")
+
+        # persiste analise
         analise = Analise(
             usuario_id=usuario.id,
-            cliente_id=cliente.id,
-            tipo_id=tipo_id,
-            processo_id=processo.id if processo else None,
-            arquivo_nome=file.filename,
+            titulo=titulo,                        # <- requer coluna 'titulo' em Analise
+            arquivo_nome=filename,
             arquivo_original_url=file_location,
             texto_extraido=texto_extraido,
             texto_limpo=texto_limpo,
-            tokens=contagem["tokens"],
-            caracteres=contagem["caracteres"],
-            status=1,  # aguardando
+            tokens=tokens,
+            caracteres=caracteres,
+            status=1,                             # aguardando
             data_envio=datetime.now(),
         )
         db.add(analise)
         db.commit()
         db.refresh(analise)
 
+        # dispara workflow no n8n (opcional)
         try:
             payload = {
                 "analise_id": str(analise.id),
+                "titulo": titulo,
                 "texto": texto_limpo,
                 "usuario_id": str(usuario.id),
             }
-
             r = requests.post(
                 N8N_WEBHOOK_URL_ANALISE,
                 json=payload,
-                auth=HTTPBasicAuth(N8N_USER, N8N_PASS),
+                auth=HTTPBasicAuth(N8N_USER, N8N_PASS) if N8N_USER and N8N_PASS else None,
                 timeout=20,
             )
             r.raise_for_status()
         except Exception as e:
             analise.status = 5  # erro ao enviar
             db.commit()
-            raise HTTPException(
-                status_code=500, detail=f"Erro ao enviar ao n8n: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Erro ao enviar ao n8n: {str(e)}")
 
         return {
             "id": str(analise.id),
             "status": "aguardando",
-            "arquivo": file.filename,
+            "arquivo": filename,
         }
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -209,10 +182,6 @@ def executar_analise_ppp(
     analise.tokens = contagem["tokens"]
     analise.caracteres = contagem["caracteres"]
     db.commit()
-
-    registrar_historico_token(
-        db=db, resultado_id=analise.id, etapa="leitura_ppp", tokens=contagem["tokens"]
-    )
 
     payload = {
         "analise_id": analise_id,

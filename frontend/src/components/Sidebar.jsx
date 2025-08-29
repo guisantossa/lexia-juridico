@@ -19,25 +19,9 @@ export default function Sidebar() {
 
         {/* Menu */}
         <nav className="flex flex-col gap-4">
-          <a href="/processos" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
-            <FaFileAlt className="text-lg" />
-            Processos
-          </a>
           <a href="/analises" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
             <FaFileAlt className="text-lg" />
             Análises
-          </a>
-          <a href="/clientes" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
-            <FaUserFriends  className="text-lg" />
-            Clientes
-          </a>
-          <a href="#" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
-            <FaChartBar className="text-lg" />
-            Relatórios
-          </a>
-          <a href="/configuracoes" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
-            <FaCog className="text-lg" />
-            Configurações
           </a>
           <a href="/referencias" className="flex items-center gap-3 text-sm hover:text-white text-[#9ca3af]">
             <FaBook  className="text-lg" />

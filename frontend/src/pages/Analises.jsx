@@ -1,3 +1,4 @@
+// src/pages/Analises.jsx
 import { useEffect, useState } from 'react'
 import api from "../services/api"; 
 
@@ -8,12 +9,12 @@ export default function Analises() {
   useEffect(() => {
     const token = localStorage.getItem('lexia_token')
     api.get("/analises")
-    .then((res) => {
-      setAnalises(res.data);
-    })
-    .catch(() => {
-      setErro("Erro ao carregar análises.");
-    });
+      .then((res) => {
+        setAnalises(res.data);
+      })
+      .catch(() => {
+        setErro("Erro ao carregar análises.");
+      });
   }, [])
 
   const badge = (status) => {
@@ -28,6 +29,7 @@ export default function Analises() {
         return <span className="lexia-badge-processing">Processando</span>
     }
   }
+
   const handleExcluir = async (id) => {
     const confirmar = confirm('Tem certeza que deseja excluir esta análise?')
     if (!confirmar) return
@@ -35,14 +37,13 @@ export default function Analises() {
     const token = localStorage.getItem('lexia_token')
     try {
       const res = await api.post(`/analises/${id}/excluir`);
-
-      if (!res.ok) throw new Error()
-
+      if (res.status < 200 || res.status >= 300) throw new Error()
       setAnalises((prev) => prev.filter((a) => a.id !== id))
     } catch {
       alert('Erro ao excluir a análise.')
     }
   }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -64,7 +65,7 @@ export default function Analises() {
         <table className="lexia-table">
           <thead>
             <tr className="border-b border-neutral-700">
-              <th className="py-2 pr-4">Nome</th>
+              <th className="py-2 pr-4">Título</th>
               <th className="py-2 pr-4">Tipo de Análise</th>
               <th className="py-2 pr-4">Qtd. Documentos</th>
               <th className="py-2 pr-4">Data</th>
@@ -75,9 +76,9 @@ export default function Analises() {
           <tbody>
             {analises.map((item) => (
               <tr key={item.id} className="border-b border-neutral-800 hover:bg-neutral-800/50">
-                <td className="py-2 pr-4">{item.cliente.nome}</td>
-                <td className="py-2 pr-4">{item.tipo}</td>
-                <td className="py-2 pr-4">{item.quantidade_resultados}</td>
+                <td className="py-2 pr-4">{item.titulo}</td>
+                <td className="py-2 pr-4">{item.tipo || '—'}</td>
+                <td className="py-2 pr-4">{item.quantidade_resultados ?? 1}</td>
                 <td className="py-2 pr-4">
                   {new Date(item.data_envio).toLocaleDateString('pt-BR')}
                 </td>
