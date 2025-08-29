@@ -5,7 +5,7 @@ FROM python:3.11
 # Instala dependências básicas + Tesseract
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
-    libgl1-mesa-glx \
+    libgl1 \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
